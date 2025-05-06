@@ -59,8 +59,8 @@ resource "aws_security_group" "web" {
 
   ingress {
     description = "Web security group."
-    from_port   = 80
-    to_port     = 80
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.vpc.cidr_block]
   }
