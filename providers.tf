@@ -6,12 +6,12 @@ terraform {
     }
   }
 
-  
+
   backend "s3" {
-    bucket = "tf-remote-state20250504213322809300000001"
-    key    = "my-vpc"
+    bucket         = "tf-remote-state20250504213322809300000001"
+    key            = "my-vpc"
     dynamodb_table = "tf-remote-state-lock"
-    region = "us-east-1"
+    region         = "us-east-1"
   }
 
   required_version = ">= 1.1.5"
@@ -19,4 +19,4 @@ terraform {
 
 provider "aws" {
   region = var.region
-} 
+}
