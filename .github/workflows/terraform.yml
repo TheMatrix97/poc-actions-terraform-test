@@ -1,0 +1,43 @@
+name: Github Actions Terraform
+on: [push]
+jobs:
+  format_check:
+    name: Terraform Validation Check
+    runs-on: ubuntu-latest
+    outputs:
+      validate_outcome: ${{ steps.validate.outcome }}
+      validate_stdout: ${{ steps.validate.outputs.stdout }}
+      fmt_outcome: ${{ steps.fmt.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract Backend Config
+        run: |
+          cat << EOF > backend.conf
+            bucket = "${S3_BUCKET}"
+            key    = "terraform.tfstate"
+            dynamodb_table = "${DYNAMODB_TABLE}"
+            region = "us-east-1"
+          EOF
+        env:
+          S3_BUCKET: ${{ vars.s3_bucket }}
+          DYNAMODB_TABLE:  ${{ vars.dynamodb_table }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check -diff -recursive -no-color
+        continue-on-error: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config=backend.conf
+        env:
+          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN:  ${{ secrets.AWS_SESSION_TOKEN }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
