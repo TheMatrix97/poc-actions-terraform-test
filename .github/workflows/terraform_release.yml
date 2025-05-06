@@ -5,7 +5,6 @@ on:
 jobs:
   release:
     name: Terraform release job
-    needs: format_check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +37,7 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate -no-color
-        
+
       - name: Terraform Plan
         run: terraform apply -auto-approve -no-color
         id: plan
